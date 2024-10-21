@@ -1,8 +1,12 @@
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const CategoryRoutes = require("./Routes/CategoryRoutes")
 
 const app = express();
+
+app.use(express.json());
+
 // localURL = "mongodb://localhost:27017/inventoryManagementSystem";
 AtlasURL = `mongodb+srv://bilalahmed:${process.env.DB_PASSWORD}@forteaching.plyfh.mongodb.net/?retryWrites=true&w=majority&appName=forTeaching`;
 
@@ -15,14 +19,15 @@ mongoose
     console.log("some error occured", err);
   });
 
-//exaample endpoint
+//example endpoint
 app.get("/api", (req, res) => {
   res.send("end point is working");
 });
 
-app.get("/bilal", (req, res) => {
-  res.send("your name is ");
-});
+
+//Routes
+app.use("/category", CategoryRoutes)
+
 
 app.listen(300, () => {
   console.log("server is running on 300");
