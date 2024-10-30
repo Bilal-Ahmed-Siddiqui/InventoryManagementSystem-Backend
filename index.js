@@ -3,6 +3,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const CategoryRoutes = require("./Routes/CategoryRoutes")
 const ProductRoutes = require("./Routes/ProductRoutes")
+const UserRoutes = require("./Routes/UserRoutes")
 const app = express();
 
 app.use(express.json());
@@ -28,6 +29,8 @@ app.get("/api", (req, res) => {
 //Routes
 app.use("/category", CategoryRoutes)
 app.use("/product", ProductRoutes)
+app.use("/user", UserRoutes)
+
 
 app.listen(300, () => {
   console.log("server is running on 300");
