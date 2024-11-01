@@ -1,5 +1,6 @@
 const express = require("express");
 const Product = require("../Models/Product");
+const { body, validationResult } = require("express-validator");
 const router = express.Router();
 
 //get all products
@@ -31,43 +32,103 @@ router.get("/:id", async (req, res) => {
 });
 
 //create Product endpoint
-router.post("/create", async (req, res) => {
-  try {
-    const { Name, Price, Quantity, inStock, Category } = req.body;
-    const newProduct = new Product({
-      Name,
-      Price,
-      Quantity,
-      inStock,
-      Category,
-    });
-
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-//Update Product
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { Name, Price, Quantity, inStock, Category } = req.body;
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      { _id: id },
-      { Name, Price, Quantity, inStock, Category },
-      { new: true }
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ error: "Product not found" });
+router.post(
+  "/create",
+  [
+    body("Name")
+      .notEmpty()
+      .isString()
+      .isLength({ max: 50 })
+      .withMessage("name is required, max length 50 letters"),
+    body("Price")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("price is required, must be integer"),
+    body("Quantity")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Quantity is required, must be integer"),
+    body("inStock")
+      .notEmpty()
+      .isBoolean()
+      .withMessage("inStock is required, must be boolean"),
+    body("Category")
+      .notEmpty()
+      .isMongoId()
+      .withMessage("Category is required, must be a mongoId"),
+  ],
+  async (req, res) => {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json({ error: error });
     }
-    return res.status(200).json(updatedProduct);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    try {
+      const { Name, Price, Quantity, inStock, Category } = req.body;
+      const newProduct = new Product({
+        Name,
+        Price,
+        Quantity,
+        inStock,
+        Category,
+      });
+
+      const savedProduct = await newProduct.save();
+      res.status(201).json(savedProduct);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
+//Update Product
+router.put(
+  "/:id",
+  [
+    body("Name")
+      .notEmpty()
+      .isString()
+      .isLength({ max: 50 })
+      .withMessage("name is required, max length 50 letters"),
+    body("Price")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("price is required, must be integer"),
+    body("Quantity")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Quantity is required, must be integer"),
+    body("inStock")
+      .notEmpty()
+      .isBoolean()
+      .withMessage("inStock is required, must be boolean"),
+    body("Category")
+      .notEmpty()
+      .isMongoId()
+      .withMessage("Category is required, must be a mongoId"),
+  ],
+  async (req, res) => {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json({ error: error });
+    }
+    try {
+      const { id } = req.params;
+      const { Name, Price, Quantity, inStock, Category } = req.body;
+
+      const updatedProduct = await Product.findByIdAndUpdate(
+        { _id: id },
+        { Name, Price, Quantity, inStock, Category },
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      return res.status(200).json(updatedProduct);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
 
 //delete product
 router.delete("/:id", async (req, res) => {
