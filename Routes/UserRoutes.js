@@ -1,8 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
 const router = express.Router();
+
+const JWT_SECRET = "Mysecret"
 
 //signup endpoint
 router.post(
@@ -78,7 +81,9 @@ router.post("/login",
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    res.status(200).json({ message: "login successful" });
+    const token = await jwt.sign({ id: user._id }, JWT_SECRET);
+
+    res.status(200).json({ token: token });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

@@ -8,11 +8,11 @@ const app = express();
 
 app.use(express.json());
 
-// localURL = "mongodb://localhost:27017/inventoryManagementSystem";
-AtlasURL = `mongodb+srv://bilalahmed:${process.env.DB_PASSWORD}@forteaching.plyfh.mongodb.net/?retryWrites=true&w=majority&appName=forTeaching`;
+localURL = "mongodb://localhost:27017/inventoryManagementSystem";
+// AtlasURL = `mongodb+srv://bilalahmed:${process.env.DB_PASSWORD}@forteaching.plyfh.mongodb.net/?retryWrites=true&w=majority&appName=forTeaching`;
 
 mongoose
-  .connect(AtlasURL)
+  .connect(localURL)
   .then(() => {
     console.log("Db is connected");
   })
