@@ -1,11 +1,13 @@
 const express = require("express");
 const Category = require("../Models/Category");
+const auth = require("../Middlewares/Auth")
 const { body, validationResult } = require("express-validator");
 const router = express.Router();
 
 //create category endpoint
 router.post(
   "/create",
+  auth,
   [
     body("name")
       .notEmpty()
@@ -20,7 +22,8 @@ router.post(
     }
     try {
       const { name } = req.body;
-      const newCategory = new Category({ name });
+      const userId = req.userId;
+      const newCategory = new Category({ name, userId });
       const savedCategory = await newCategory.save();
       res.status(201).json(savedCategory);
     } catch (error) {
@@ -30,7 +33,7 @@ router.post(
 );
 
 //get all categories
-router.get("/getAll", async (req, res) => {
+router.get("/getAll", auth, async (req, res) => {
   try {
     const categories = await Category.find();
     if (!categories) {
@@ -44,7 +47,7 @@ router.get("/getAll", async (req, res) => {
 });
 
 //get category by id categories
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -63,6 +66,7 @@ router.get("/:id", async (req, res) => {
 //update category
 router.put(
   "/:id",
+  auth,
   [
     body("name")
       .notEmpty()
@@ -96,7 +100,7 @@ router.put(
 );
 
 //delete category
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
     const deletedCategory = await Category.findByIdAndDelete({ _id: id });

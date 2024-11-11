@@ -1,10 +1,11 @@
 const express = require("express");
 const Product = require("../Models/Product");
 const { body, validationResult } = require("express-validator");
+const auth = require("../Middlewares/Auth");
 const router = express.Router();
 
 //get all products
-router.get("/getall", async (req, res) => {
+router.get("/getall", auth, async (req, res) => {
   try {
     const products = await Product.find().populate("Category");
 
@@ -15,7 +16,7 @@ router.get("/getall", async (req, res) => {
 });
 
 //get Product by id
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -34,6 +35,7 @@ router.get("/:id", async (req, res) => {
 //create Product endpoint
 router.post(
   "/create",
+  auth,
   [
     body("Name")
       .notEmpty()
@@ -64,12 +66,14 @@ router.post(
     }
     try {
       const { Name, Price, Quantity, inStock, Category } = req.body;
+      const userId = req.userId;
       const newProduct = new Product({
         Name,
         Price,
         Quantity,
         inStock,
         Category,
+        userId,
       });
 
       const savedProduct = await newProduct.save();
@@ -82,6 +86,7 @@ router.post(
 //Update Product
 router.put(
   "/:id",
+  auth,
   [
     body("Name")
       .notEmpty()
@@ -131,7 +136,7 @@ router.put(
 );
 
 //delete product
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
     const deletedProduct = await Product.findByIdAndDelete({ _id: id });
