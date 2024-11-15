@@ -4,32 +4,31 @@ const { body, validationResult } = require("express-validator");
 const auth = require("../Middlewares/Auth");
 const Order = require("../Models/Order");
 
-
 //create order endpoint
 router.post(
   "/create",
   auth,
   [
-    body("productList.productId")
+    body("productList").isArray().withMessage("Product List must be an array"),
+    body("productList.*.productId")
       .notEmpty()
       .isMongoId()
-      .withMessage("product id  is required, must be a valid MongoDB ID"),
-    body("productList.quantity")
+      .withMessage("Product ID must be a valid MongoDB ID"),
+
+    body("productList.*.quantity")
       .notEmpty()
       .isNumeric()
-      .withMessage("quantity is required, must be a numeric value"),
-    body("productList.price")
+      .withMessage("Quantity must be a numeric value"),
+
+    body("productList.*.price")
       .notEmpty()
       .isNumeric()
-      .withMessage("price is required, must be a numeric value"),
-    body("userId")
-      .notEmpty()
-      .isMongoId()
-      .withMessage("userId is required, must be a valid MongoDB ID"),
+      .withMessage("Price must be a numeric value"),
+
     body("totalPrice")
       .notEmpty()
       .isNumeric()
-      .withMessage("total price is required, must be a numeric value"),
+      .withMessage("Total price is required, must be a numeric value"),
   ],
   async (req, res) => {
     const error = validationResult(req);
@@ -37,7 +36,8 @@ router.post(
       return res.status(400).json({ error: error });
     }
     try {
-      const { productList, userId, totalPrice } = req.body;
+      const { productList, totalPrice } = req.body;
+      const userId = req.userId;
       const newOrder = new Order({ productList, userId, totalPrice });
       await newOrder.save();
       res.status(201).json(newOrder);
