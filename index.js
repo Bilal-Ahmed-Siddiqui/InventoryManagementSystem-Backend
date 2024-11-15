@@ -1,9 +1,10 @@
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
-const CategoryRoutes = require("./Routes/CategoryRoutes")
-const ProductRoutes = require("./Routes/ProductRoutes")
-const UserRoutes = require("./Routes/UserRoutes")
+const CategoryRoutes = require("./Routes/CategoryRoutes");
+const ProductRoutes = require("./Routes/ProductRoutes");
+const UserRoutes = require("./Routes/UserRoutes");
+const OrderRoutes = require("./Routes/OrderRoutes");
 const app = express();
 
 app.use(express.json());
@@ -25,12 +26,11 @@ app.get("/api", (req, res) => {
   res.send("end point is working");
 });
 
-
 //Routes
-app.use("/category", CategoryRoutes)
-app.use("/product", ProductRoutes)
-app.use("/user", UserRoutes)
-
+app.use("/category", CategoryRoutes);
+app.use("/product", ProductRoutes);
+app.use("/user", UserRoutes);
+app.use("/order", OrderRoutes);
 
 app.listen(300, () => {
   console.log("server is running on 300");
