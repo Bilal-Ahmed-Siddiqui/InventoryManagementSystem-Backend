@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
+const auth = require("../Middlewares/Auth")
 const router = express.Router();
 
 const JWT_SECRET = "Mysecret"
@@ -88,5 +89,25 @@ router.post("/login",
     return res.status(500).json({ error: error.message });
   }
 });
+
+
+//ADMIN ROUTE getall users
+
+router.get("/getall", auth, async (req, res) => {
+  const userId = req.userId;
+  try {
+    const user = await User.findOne({_id: userId})
+    if (!user) {
+      return res.status(404).json({ message: "user does not exist" });
+    }
+    if (user.role!== 'admin') {
+      return res.status(403).json({ message: "You are not authorized to perform this action" });
+    }
+    const users = await User.find({}).select("-password");
+    res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+})
 
 module.exports = router;
