@@ -2,6 +2,7 @@ const express = require("express");
 const Product = require("../Models/Product");
 const { body, validationResult } = require("express-validator");
 const auth = require("../Middlewares/Auth");
+const upload = require("../Middlewares/Upload");
 const router = express.Router();
 
 //get all products
@@ -36,25 +37,36 @@ router.get("/:id", auth, async (req, res) => {
 router.post(
   "/create",
   auth,
+  upload.single('productPicture'),
   [
-    body("Name")
+    (req, res, next) => {
+      if (req.body.jsonData) {
+        try {
+          req.body.jsonData = JSON.parse(req.body.jsonData);
+        } catch (error) {
+          return res.status(400).json({ error: "Invalid JSON format in jsonData" });
+        }
+      }
+      next();
+    },
+    body("jsonData.Name")
       .notEmpty()
       .isString()
       .isLength({ max: 50 })
       .withMessage("name is required, max length 50 letters"),
-    body("Price")
+    body("jsonData.Price")
       .notEmpty()
       .isNumeric()
       .withMessage("price is required, must be integer"),
-    body("Quantity")
+    body("jsonData.Quantity")
       .notEmpty()
       .isNumeric()
       .withMessage("Quantity is required, must be integer"),
-    body("inStock")
+    body("jsonData.inStock")
       .notEmpty()
       .isBoolean()
       .withMessage("inStock is required, must be boolean"),
-    body("Category")
+    body("jsonData.Category")
       .notEmpty()
       .isMongoId()
       .withMessage("Category is required, must be a mongoId"),
@@ -65,13 +77,17 @@ router.post(
       return res.status(400).json({ error: error });
     }
     try {
-      const { Name, Price, Quantity, inStock, Category } = req.body;
+      const { Name, Price, Quantity, inStock, Category } = req.body.jsonData;
+      if(!req.file){
+        return res.status(404).json({ error: "Product Picture not found"});
+      }
       const userId = req.userId;
       const newProduct = new Product({
         Name,
         Price,
         Quantity,
         inStock,
+        picture: `uploads/${req.file.filename}`,
         Category,
         userId,
       });

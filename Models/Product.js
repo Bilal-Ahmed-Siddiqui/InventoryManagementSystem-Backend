@@ -18,6 +18,10 @@ const productSchema = mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    picture: {
+      type: String,
+      required: true,
+    },
     Category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

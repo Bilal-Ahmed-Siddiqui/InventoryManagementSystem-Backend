@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const path = require('path');
 const CategoryRoutes = require("./Routes/CategoryRoutes");
 const ProductRoutes = require("./Routes/ProductRoutes");
 const UserRoutes = require("./Routes/UserRoutes");
@@ -31,6 +32,9 @@ app.use("/category", CategoryRoutes);
 app.use("/product", ProductRoutes);
 app.use("/user", UserRoutes);
 app.use("/order", OrderRoutes);
+
+// Serve static files from the 'uploads' folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(300, () => {
   console.log("server is running on 300");
