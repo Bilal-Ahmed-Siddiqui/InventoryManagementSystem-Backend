@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const cors = require("cors");
 const mongoose = require("mongoose");
 const path = require('path');
 const CategoryRoutes = require("./Routes/CategoryRoutes");
@@ -9,7 +10,7 @@ const OrderRoutes = require("./Routes/OrderRoutes");
 const app = express();
 
 app.use(express.json());
-
+app.use(cors())
 localURL = "mongodb://localhost:27017/inventoryManagementSystem";
 // AtlasURL = `mongodb+srv://bilalahmed:${process.env.DB_PASSWORD}@forteaching.plyfh.mongodb.net/?retryWrites=true&w=majority&appName=forTeaching`;
 
