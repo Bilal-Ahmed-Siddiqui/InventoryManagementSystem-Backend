@@ -100,7 +100,7 @@ router.get("/getall", auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "user does not exist" });
     }
-    if (user.role!== 'admin') {
+    if (!user.isAdmin) {
       return res.status(403).json({ message: "You are not authorized to perform this action" });
     }
     const users = await User.find({}).select("-password");
